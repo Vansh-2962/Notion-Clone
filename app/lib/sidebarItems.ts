@@ -1,4 +1,4 @@
-import { LucideIcon, Plus, Search, Settings } from "lucide-react"
+import { LucideIcon, Plus, Search, Settings, Trash } from "lucide-react"
 
 export type SidebarItemsType = {
   id: number
@@ -22,5 +22,10 @@ export const sidebarItems: SidebarItemsType[] = [
     id: 3,
     label: "New Page",
     icon: Plus,
+  },
+  {
+    id: 4,
+    label: "Trash",
+    icon: Trash,
   },
 ]

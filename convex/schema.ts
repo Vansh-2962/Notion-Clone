@@ -8,6 +8,8 @@ export default defineSchema({
     coverImage: v.optional(v.string()),
     isArchived: v.boolean(),
     isPublished: v.boolean(),
+    isPrivate: v.boolean(),
+    isFavourite: v.boolean(),
     parentId: v.optional(v.id("documents")),
     userId: v.string(),
     icon: v.optional(v.string()),

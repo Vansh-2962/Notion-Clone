@@ -27,5 +27,6 @@ export const sidebarItems: SidebarItemsType[] = [
     id: 4,
     label: "Trash",
     icon: Trash,
+    href: "/dashboard/trash",
   },
 ]

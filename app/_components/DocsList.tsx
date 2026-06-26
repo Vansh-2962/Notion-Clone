@@ -97,7 +97,7 @@ const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
                 )}
               </div>
 
-              <p className="truncate">{item.title}</p>
+              <p className="max-w-30 truncate">{item.title}</p>
             </Link>
 
             <div className="flex items-center opacity-0 group-hover:opacity-100">

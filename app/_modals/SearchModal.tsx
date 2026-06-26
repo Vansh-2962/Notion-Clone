@@ -73,7 +73,7 @@ export function SearchModal({ open, setOpen }: SearchModalProps) {
                   href={`/dashboard/doc/${doc._id}`}
                   onClick={handleRemoveModal}
                 >
-                  <CommandItem className="cursor-pointer dark:hover:bg-primary hover:bg-primary/10">
+                  <CommandItem className="cursor-pointer hover:bg-primary/10 dark:hover:bg-primary">
                     <FileTypeCorner />
                     <span>{doc.title}</span>
                     <CommandShortcut>

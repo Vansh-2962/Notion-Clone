@@ -1,5 +1,4 @@
-import { useMutation } from "convex/react"
-import { Doc, Id } from "./_generated/dataModel"
+import { Id } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
@@ -19,6 +18,27 @@ export const getDocs = query({
       .take(10)
 
     return docs
+  },
+})
+
+export const getDoc = query({
+  args: { _id: v.string() },
+  handler: async (ctx, args) => {
+    const identity = ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = await ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    return doc[0]
   },
 })
 
@@ -136,5 +156,31 @@ export const clearTrash = mutation({
     return {
       deletedCount: trashedDocs.length,
     }
+  },
+})
+
+export const updateTitle = mutation({
+  args: { _id: v.string(), title: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const updatedTitle = ctx.db.patch(args._id as Id<"documents">, {
+      title: args.title,
+    })
+
+    return updatedTitle
   },
 })

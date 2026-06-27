@@ -72,12 +72,23 @@ const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
               className="flex items-center gap-3"
             >
               <div className="relative h-4 w-4">
-                <FileTypeCorner
-                  className={cn(
-                    "absolute inset-0 h-4 w-4 transition-opacity",
-                    hasChildren && "group-hover:opacity-0"
-                  )}
-                />
+                {item.icon ? (
+                  <span
+                    className={cn(
+                      "absolute inset-0 h-4 w-4 transition-opacity",
+                      hasChildren && "group-hover:opacity-0"
+                    )}
+                  >
+                    <img src={item.icon} />
+                  </span>
+                ) : (
+                  <FileTypeCorner
+                    className={cn(
+                      "absolute inset-0 h-4 w-4 transition-opacity",
+                      hasChildren && "group-hover:opacity-0"
+                    )}
+                  />
+                )}
 
                 {hasChildren && (
                   <ChevronRight

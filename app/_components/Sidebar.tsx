@@ -4,7 +4,7 @@ import { sidebarItems, SidebarItemsType } from "../lib/sidebarItems"
 import { cn } from "@/lib/utils"
 import { ChevronsLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import DocsList from "./DocsList"
@@ -23,6 +23,8 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import { SearchModal } from "../_modals/SearchModal"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Kbd } from "@/components/ui/kbd"
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false)
@@ -47,6 +49,21 @@ const Sidebar = () => {
       setOpen(true)
     }
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key.toLowerCase() === "k") {
+        e.preventDefault()
+        setOpen(true)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [])
 
   return (
     <aside
@@ -91,6 +108,7 @@ const Sidebar = () => {
                   {trashCount}
                 </Badge>
               )}
+              {item.label.toLowerCase() === "search" && <Kbd>⌘ K</Kbd>}
             </div>
           ))}
         </div>
@@ -99,7 +117,18 @@ const Sidebar = () => {
         <div className="py-3">
           <span className="px-5 text-xs font-bold">RECENTS</span>
           <div className="py-3">
-            <DocsList docs={docs as Doc<"documents">[]} />
+            {docs === undefined ? (
+              <div className="px-5 py-3">
+                <div className="flex w-fit items-center gap-4">
+                  <div className="grid gap-2">
+                    <Skeleton className="h-4 w-39" />
+                    <Skeleton className="ml-12 h-4 w-39" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <DocsList docs={docs as Doc<"documents">[]} />
+            )}
           </div>
         </div>
 

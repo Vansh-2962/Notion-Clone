@@ -184,3 +184,29 @@ export const updateTitle = mutation({
     return updatedTitle
   },
 })
+
+export const updateIcon = mutation({
+  args: { _id: v.string(), url: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const updatedIcon = ctx.db.patch(args._id as Id<"documents">, {
+      icon: args.url,
+    })
+
+    return updatedIcon
+  },
+})

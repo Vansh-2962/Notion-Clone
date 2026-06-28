@@ -1,17 +1,10 @@
 "use client"
-import { timeAgo } from "@/app/lib/helper"
+import { timeAgo } from "@/lib/helper"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
-import {
-  Globe,
-  Images,
-  MessageSquareMore,
-  Smile,
-  Star,
-  Trash,
-} from "lucide-react"
+import { Images, MessageSquareMore, Smile, Trash } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react"
@@ -22,10 +15,15 @@ import { useUser } from "@clerk/nextjs"
 import { Editor } from "@/app/_components/DynamicEditor"
 import DocSkeleton from "@/app/_components/DocSkeleton"
 import MenuButtons from "@/app/_components/MenuButtons"
+import { useUploadThing } from "@/lib/uploadthing"
+import Image from "next/image"
+import { toast } from "sonner"
+import { getUploadErrorMessage } from "@/lib/uploadThingError"
 
 const Page = () => {
   const { id } = useParams()
   const { theme } = useTheme()
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const [emojiModal, setEmojiModal] = useState<boolean>(false)
   const [isCommenting, setIsCommenting] = useState<boolean>(false)
@@ -35,6 +33,8 @@ const Page = () => {
   const updateTitle = useMutation(api.document.updateTitle)
   const updateIcon = useMutation(api.document.updateIcon)
   const deleteComment = useMutation(api.document.deleteComment)
+  const addCover = useMutation(api.document.addCover)
+  const removeCover = useMutation(api.document.removeCover)
 
   const doc = useQuery(api.document.getDoc, {
     _id: id as string,
@@ -72,6 +72,25 @@ const Page = () => {
       _id: id as string,
     })
   }
+
+  const handleRemoveCover = (_id: Id<"documents">) => {
+    if (!_id) return
+    removeCover({
+      _id: _id,
+    })
+  }
+
+  const { startUpload, isUploading } = useUploadThing("imageUploader", {
+    onClientUploadComplete: async (res: any) => {
+      await addCover({
+        _id: id as Id<"documents">,
+        url: res?.[0]?.ufsUrl,
+      })
+    },
+    onUploadError: (error: Error) => {
+      toast.error(getUploadErrorMessage(error))
+    },
+  })
 
   if (doc === undefined) {
     return <DocSkeleton />
@@ -112,13 +131,37 @@ const Page = () => {
 
         <MenuButtons
           id={id as Id<"documents">}
+          title={doc.title}
           isFav={doc.isFavourite}
           isPub={doc.isPublished}
           isPriv={doc.isPrivate}
         />
       </header>
 
-      <section className="h-64 w-full">{/* Banner Image */}</section>
+      <section className="group relative h-64 w-full">
+        {doc.coverImage ? (
+          <Image
+            src={doc.coverImage}
+            alt="Document cover"
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : isUploading ? (
+          <Skeleton className="h-full w-full" />
+        ) : null}
+        <div className="absolute right-2 bottom-2 flex items-center gap-2 opacity-0 group-hover:opacity-100">
+          {doc.coverImage && (
+            <Button
+              onClick={() => handleRemoveCover(doc._id as Id<"documents">)}
+              size={"xs"}
+              className="bg-white/50 backdrop-blur-sm"
+            >
+              Remove cover
+            </Button>
+          )}
+        </div>
+      </section>
 
       <section className="mx-auto max-w-6xl">
         <div className="group py-5">
@@ -133,13 +176,33 @@ const Page = () => {
               <Smile /> Add icon
             </Button>
 
-            <Button
-              size={"sm"}
-              variant={"ghost"}
-              className="border-none text-muted-foreground outline-none focus:outline-0"
-            >
-              <Images /> Add cover
-            </Button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const files = e.target.files
+                if (!files?.length) return
+
+                await startUpload(Array.from(files))
+
+                e.target.value = ""
+              }}
+            />
+
+            {!doc.coverImage && (
+              <Button
+                disabled={isUploading}
+                onClick={() => fileRef.current?.click()}
+                size={"sm"}
+                variant={"ghost"}
+                className="border-none text-muted-foreground outline-none focus:outline-0"
+              >
+                <Images /> Add cover
+              </Button>
+            )}
+
             <Button
               size={"sm"}
               variant={"ghost"}

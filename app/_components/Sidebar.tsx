@@ -1,6 +1,6 @@
 "use client"
 import { UserButton, useUser } from "@clerk/nextjs"
-import { sidebarItems, SidebarItemsType } from "../lib/sidebarItems"
+import { sidebarItems, SidebarItemsType } from "../../lib/sidebarItems"
 import { cn } from "@/lib/utils"
 import { ChevronsLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"

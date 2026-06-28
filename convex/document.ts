@@ -362,6 +362,58 @@ export const addToFavourites = mutation({
   },
 })
 
+export const addCover = mutation({
+  args: { _id: v.string(), url: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const imageDoc = ctx.db.patch(args._id as Id<"documents">, {
+      coverImage: args.url,
+    })
+
+    return imageDoc
+  },
+})
+
+export const removeCover = mutation({
+  args: { _id: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const imageDoc = ctx.db.patch(args._id as Id<"documents">, {
+      coverImage: undefined,
+    })
+
+    return imageDoc
+  },
+})
+
 export const publishDoc = mutation({
   args: { _id: v.string(), val: v.boolean() },
   handler: async (ctx, args) => {
@@ -380,11 +432,11 @@ export const publishDoc = mutation({
       throw new Error("Doc not found")
     }
 
-    const favDoc = ctx.db.patch(args._id as Id<"documents">, {
-      isFavourite: args.val,
+    const publishedDoc = ctx.db.patch(args._id as Id<"documents">, {
+      isPublished: args.val,
     })
 
-    return favDoc
+    return publishedDoc
   },
 })
 

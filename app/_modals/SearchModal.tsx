@@ -41,7 +41,7 @@ import {
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Doc } from "@/convex/_generated/dataModel"
-import { timeAgo } from "../lib/helper"
+import { timeAgo } from "../../lib/helper"
 import Link from "next/link"
 
 interface SearchModalProps {

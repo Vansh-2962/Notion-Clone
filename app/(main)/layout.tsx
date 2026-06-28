@@ -7,6 +7,7 @@ import Navbar from "../_components/Navbar"
 import ConvexClientProvider from "@/app/providers/ConvexClientProvider"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -37,7 +38,9 @@ export default function RootLayout({
             <ConvexClientProvider>
               {/* <Navbar /> */}
               <Toaster />
-              <ThemeProvider>{children}</ThemeProvider>
+              <ThemeProvider>
+                <TooltipProvider>{children}</TooltipProvider>
+              </ThemeProvider>
             </ConvexClientProvider>
           </main>
         </ClerkProvider>

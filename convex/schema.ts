@@ -13,8 +13,10 @@ export default defineSchema({
     parentId: v.optional(v.id("documents")),
     userId: v.string(),
     icon: v.optional(v.string()),
+    comments: v.optional(v.string()),
   })
     .index("by_title", ["title"])
     .index("by_userid", ["userId"])
-    .index("by_parentId", ["parentId"]),
+    .index("by_parentId", ["parentId"])
+    .index("by_user_parent", ["userId", "parentId"]),
 })

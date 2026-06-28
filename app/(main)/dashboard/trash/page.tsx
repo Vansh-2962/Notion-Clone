@@ -25,10 +25,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 const Page = () => {
+  const [deletingTitle, setDeletingTitle] = useState("")
+
   const restoreDoc = useMutation(api.document.restoreDoc)
   const clearTrash = useMutation(api.document.clearTrash)
+  const deleteDoc = useMutation(api.document.deleteDoc)
+
   const docs = useQuery(api.document.getDocs)
   const trashedDocs =
     (docs?.length && docs.filter((doc: Doc<"documents">) => doc.isArchived)) ||
@@ -37,6 +43,15 @@ const Page = () => {
   const onRestore = (_id: Id<"documents">) => {
     if (!_id) return
     restoreDoc({ _id })
+  }
+
+  const deleteSingleDoc = (_id: Id<"documents">, title: string) => {
+    if (!_id) return
+    if (title.trim().toLowerCase() !== deletingTitle.trim().toLowerCase()) {
+      toast.error("Confirmation failed. Please enter the exact page title.")
+      return
+    }
+    deleteDoc({ _id })
   }
 
   const onClear = () => {
@@ -110,9 +125,51 @@ const Page = () => {
                     >
                       <Undo2 />
                     </Button>
-                    <Button size={"icon"} variant={"destructive"}>
-                      <Trash />
-                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size={"icon"} variant={"destructive"}>
+                          <Trash />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                            This action cannot be undone. Enter{" "}
+                            <span className="font-semibold text-foreground">
+                              {doc.title}
+                            </span>{" "}
+                            to permanently delete this page and all of its
+                            nested pages.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="flex flex-col">
+                          <Input
+                            value={deletingTitle}
+                            onChange={(e) => setDeletingTitle(e.target.value)}
+                            className="mb-3 w-full"
+                            autoFocus
+                          />
+                          <AlertDialogFooter>
+                            <div className="flex items-center gap-2">
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                disabled={!deletingTitle}
+                                onClick={() =>
+                                  deleteSingleDoc(doc._id, doc.title)
+                                }
+                                variant={"destructive"}
+                              >
+                                Yes, Delete
+                              </AlertDialogAction>
+                            </div>
+                          </AlertDialogFooter>
+                        </div>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))}

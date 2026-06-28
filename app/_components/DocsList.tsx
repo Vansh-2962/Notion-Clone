@@ -6,6 +6,7 @@ import {
   Copy,
   Ellipsis,
   FileTypeCorner,
+  Link2,
   Plus,
   Trash,
 } from "lucide-react"
@@ -23,11 +24,15 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
+import { useOrigin } from "@/hooks/use-origin"
 
 const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
   const [expanded, setExpanded] = useState<Record<Id<"documents">, boolean>>({})
+
+  const origin = useOrigin()
   const moveToTrash = useMutation(api.document.moveToTrash)
   const createDoc = useMutation(api.document.createDocument)
+  const duplicateDoc = useMutation(api.document.duplicate)
 
   function onDelete(id: Id<"documents">) {
     const promise = moveToTrash({ _id: id })
@@ -41,6 +46,19 @@ const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
   const handleCreate = (parentId: Id<"documents">) => {
     if (!parentId) return
     createDoc({ title: "Untitled", parentId })
+  }
+
+  const handleDuplicate = async (id: Id<"documents">) => {
+    if (!id) return
+    await duplicateDoc({
+      _id: id,
+    })
+  }
+
+  const handleCopyLink = (id: Id<"documents">) => {
+    const link = `${origin}/dashboard/doc/${id}`
+    navigator.clipboard.writeText(link)
+    toast.success("Link copied")
   }
 
   const unArchivedDocs =
@@ -121,9 +139,16 @@ const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
 
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
-                    <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="truncate">
+                      {item.title}
+                    </DropdownMenuLabel>
 
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleCopyLink(item._id)}>
+                      <Link2 className="h-3 w-3" />
+                      Copy Link
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => handleDuplicate(item._id)}>
                       <Copy className="h-3 w-3" />
                       Duplicate
                     </DropdownMenuItem>

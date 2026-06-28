@@ -11,31 +11,23 @@ import DocsList from "./DocsList"
 import { useRouter } from "next/navigation"
 import { Doc } from "@/convex/_generated/dataModel"
 import { Badge } from "@/components/ui/badge"
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
 import { SearchModal } from "../_modals/SearchModal"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Kbd } from "@/components/ui/kbd"
+import FavDocsList from "./FavDocsList"
+import { Document } from "../types/types"
+import PrivateDocsList from "./PrivateDocsList"
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
+
   const docs = useQuery(api.document.getDocs)
   const createDoc = useMutation(api.document.createDocument)
   const router = useRouter()
 
   const auth = useUser()
   const username = auth.user?.fullName
-  const imgURL = auth.user?.imageUrl
 
   const trashCount =
     (docs && docs.filter((doc: Doc<"documents">) => doc.isArchived).length) ?? 0
@@ -131,6 +123,8 @@ const Sidebar = () => {
             )}
           </div>
         </div>
+        <FavDocsList docs={docs as Doc<"documents">[]} />
+        <PrivateDocsList docs={docs as Doc<"documents">[]} />
 
         {/* Search Command modal */}
         <SearchModal open={open} setOpen={setOpen} />

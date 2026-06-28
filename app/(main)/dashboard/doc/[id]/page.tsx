@@ -4,22 +4,44 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
-import { Globe, Images, MessageSquareMore, Smile } from "lucide-react"
+import {
+  Globe,
+  Images,
+  MessageSquareMore,
+  Smile,
+  Star,
+  Trash,
+} from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react"
 import { useTheme } from "next-themes"
+import Comment from "@/app/_components/Comment"
+import { Doc, Id } from "@/convex/_generated/dataModel"
+import { useUser } from "@clerk/nextjs"
+import { Editor } from "@/app/_components/DynamicEditor"
+import DocSkeleton from "@/app/_components/DocSkeleton"
+import MenuButtons from "@/app/_components/MenuButtons"
 
 const Page = () => {
   const { id } = useParams()
   const { theme } = useTheme()
+
   const [emojiModal, setEmojiModal] = useState<boolean>(false)
+  const [isCommenting, setIsCommenting] = useState<boolean>(false)
+
   const titleRef = useRef<HTMLHeadingElement>(null)
+
   const updateTitle = useMutation(api.document.updateTitle)
   const updateIcon = useMutation(api.document.updateIcon)
+  const deleteComment = useMutation(api.document.deleteComment)
+
   const doc = useQuery(api.document.getDoc, {
     _id: id as string,
   })
+
+  const { user } = useUser()
+  const profileImg = user?.imageUrl
 
   useEffect(() => {
     if (titleRef.current && doc?.title) {
@@ -45,8 +67,18 @@ const Page = () => {
     setEmojiModal(false)
   }
 
+  const handleDeleteComment = async () => {
+    await deleteComment({
+      _id: id as string,
+    })
+  }
+
+  if (doc === undefined) {
+    return <DocSkeleton />
+  }
+
   return (
-    <main className="w-full">
+    <main className="h-screen w-full overflow-y-auto">
       <header className="flex items-center justify-between px-6 py-4">
         <div className="flex items-end gap-3 text-nowrap">
           <h1
@@ -77,19 +109,21 @@ const Page = () => {
             )}
           </small>
         </div>
-        <Button>
-          <Globe className="h-4 w-4" /> Publish
-        </Button>
+
+        <MenuButtons
+          id={id as Id<"documents">}
+          isFav={doc.isFavourite}
+          isPub={doc.isPublished}
+          isPriv={doc.isPrivate}
+        />
       </header>
 
-      <section className="h-64 w-full bg-black/40">
-        {/* Banner Image */}
-      </section>
+      <section className="h-64 w-full">{/* Banner Image */}</section>
 
       <section className="mx-auto max-w-6xl">
         <div className="group py-5">
           <span className="">{doc?.icon && <img src={doc?.icon} />}</span>
-          <div className="opacity-0 transition-all ease-in-out group-hover:opacity-100 mt-1">
+          <div className="mt-1 opacity-0 transition-all ease-in-out group-hover:opacity-100">
             <Button
               size={"sm"}
               variant={"ghost"}
@@ -109,14 +143,56 @@ const Page = () => {
             <Button
               size={"sm"}
               variant={"ghost"}
+              onClick={() => setIsCommenting(!isCommenting)}
               className="border-none text-muted-foreground outline-none focus:outline-0"
             >
               <MessageSquareMore /> Add comment
             </Button>
           </div>
-          <h1 className="mt-1 text-4xl font-bold tracking-tight text-muted-foreground">
-            Home Page
+          <h1
+            ref={titleRef}
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={onBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                e.currentTarget.blur()
+              }
+            }}
+            className="mt-1 text-4xl font-bold tracking-tight text-muted-foreground outline-none dark:text-zinc-200"
+          >
+            {doc?.title ?? "Untitled"}
           </h1>
+          {doc?.comments && (
+            <div className="group my-8 flex items-center justify-between">
+              <div className="flex gap-3 text-sm text-muted-foreground">
+                <img
+                  src={profileImg}
+                  alt="profile"
+                  className="h-5 w-5 rounded-full"
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">{user?.fullName}</span>
+                  <p className="text-white">{doc?.comments}</p>
+                </div>
+              </div>
+              <Button
+                onClick={handleDeleteComment}
+                size={"icon-xs"}
+                variant={"ghost"}
+                className="opacity-0 group-hover:opacity-100"
+              >
+                <Trash />
+              </Button>
+            </div>
+          )}
+
+          <Comment
+            id={id as Id<"documents">}
+            setIsCommenting={setIsCommenting}
+            isCommenting={isCommenting}
+          />
         </div>
 
         <EmojiPicker
@@ -126,6 +202,8 @@ const Page = () => {
           onEmojiClick={handleEmojiSelect}
           className="bg-black"
         />
+
+        <Editor doc={doc as Doc<"documents">} />
       </section>
     </main>
   )

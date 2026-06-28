@@ -13,4 +13,5 @@ export interface Document {
   userId?: string
   icon?: string
   createdAt?: Date | number | string
+  comments?: string
 }

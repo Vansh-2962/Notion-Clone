@@ -66,6 +66,53 @@ export const createDocument = mutation({
   },
 })
 
+export const duplicate = mutation({
+  args: {
+    _id: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    async function duplicateRecursively(
+      originalId: Id<"documents">,
+      newParentId: Id<"documents"> | undefined
+    ): Promise<Id<"documents">> {
+      const original = await ctx.db.get(originalId)
+
+      if (!original) {
+        throw new Error("Document not found")
+      }
+
+      const { _id, _creationTime, title, ...rest } = original
+
+      const duplicatedId = await ctx.db.insert("documents", {
+        ...rest,
+        title: newParentId ? original.title : `${original.title} (Copy)`,
+        parentId: newParentId,
+        isArchived: false,
+      })
+
+      const children = await ctx.db
+        .query("documents")
+        .withIndex("by_user_parent", (q) =>
+          q.eq("userId", identity!.subject).eq("parentId", originalId)
+        )
+        .collect()
+
+      for (const child of children) {
+        await duplicateRecursively(child._id, duplicatedId)
+      }
+
+      return duplicatedId
+    }
+
+    return await duplicateRecursively(args._id, undefined)
+  },
+})
+
 export const moveToTrash = mutation({
   args: { _id: v.id("documents") },
 
@@ -208,5 +255,196 @@ export const updateIcon = mutation({
     })
 
     return updatedIcon
+  },
+})
+
+export const addComment = mutation({
+  args: { _id: v.string(), comment: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const commentedDoc = ctx.db.patch(args._id as Id<"documents">, {
+      comments: args.comment,
+    })
+
+    return commentedDoc
+  },
+})
+
+export const deleteComment = mutation({
+  args: { _id: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const result = ctx.db.patch(args._id as Id<"documents">, {
+      comments: undefined,
+    })
+
+    return result
+  },
+})
+
+export const addContent = mutation({
+  args: { _id: v.string(), content: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const commentedDoc = ctx.db.patch(args._id as Id<"documents">, {
+      content: args.content,
+    })
+
+    return commentedDoc
+  },
+})
+
+export const addToFavourites = mutation({
+  args: { _id: v.string(), val: v.boolean() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const favDoc = ctx.db.patch(args._id as Id<"documents">, {
+      isFavourite: args.val,
+    })
+
+    return favDoc
+  },
+})
+
+export const publishDoc = mutation({
+  args: { _id: v.string(), val: v.boolean() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const favDoc = ctx.db.patch(args._id as Id<"documents">, {
+      isFavourite: args.val,
+    })
+
+    return favDoc
+  },
+})
+
+export const addToPrivate = mutation({
+  args: { _id: v.string(), val: v.boolean() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = ctx.db
+      .query("documents")
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"documents">))
+      .collect()
+
+    if (!doc) {
+      throw new Error("Doc not found")
+    }
+
+    const privDoc = ctx.db.patch(args._id as Id<"documents">, {
+      isPrivate: args.val,
+    })
+
+    return privDoc
+  },
+})
+
+export const deleteDoc = mutation({
+  args: { _id: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const doc = await ctx.db.get(args._id as Id<"documents">)
+    if (!doc) throw new Error("Document not found")
+
+    if (doc.userId != identity.subject) {
+      throw new Error("Unauthorized")
+    }
+
+    async function deleteRecursively(docId: Id<"documents">) {
+      const children = await ctx.db
+        .query("documents")
+        .withIndex("by_parentId", (q) => q.eq("parentId", docId))
+        .collect()
+
+      for (const child of children) {
+        await deleteRecursively(child._id)
+      }
+
+      await ctx.db.delete(docId)
+    }
+
+    await deleteRecursively(args._id as Id<"documents">)
+
+    return { success: true }
   },
 })

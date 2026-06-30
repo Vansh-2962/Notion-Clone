@@ -79,7 +79,7 @@ const DocsList = ({ docs }: { docs: Doc<"documents">[] }) => {
         <div key={item._id}>
           <div
             role="button"
-            className="group my-1 flex cursor-pointer items-center justify-between gap-3 py-1 text-muted-foreground hover:bg-primary-foreground hover:text-primary hover:dark:bg-zinc-900 hover:dark:text-white"
+            className="group my-1 flex cursor-pointer items-center justify-between gap-3 py-1 text-sm text-muted-foreground hover:bg-primary-foreground hover:text-primary hover:dark:bg-zinc-900 hover:dark:text-white"
             style={{
               paddingLeft: `${20 + level * 20}px`,
               paddingRight: "20px",

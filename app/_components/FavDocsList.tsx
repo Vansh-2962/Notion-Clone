@@ -16,7 +16,10 @@ const FavDocsList = ({ docs }: FavDocsListProps) => {
   return (
     <main>
       <div>
-        <span className="px-5 text-xs font-bold">FAVOURITES</span>
+        {favouriteDocs?.length > 0 && (
+          <span className="px-5 text-xs font-bold">FAVOURITES</span>
+        )}
+
         <DocsList docs={favouriteDocs} />
       </div>
     </main>

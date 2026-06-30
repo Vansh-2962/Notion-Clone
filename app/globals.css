@@ -19,6 +19,48 @@
   background-color: #090b0c !important;
 }
 
+.font-inter .bn-editor {
+  font-family: Inter, sans-serif;
+}
+
+.font-serif .bn-editor {
+  font-family: Georgia, serif;
+}
+
+.font-mono .bn-editor {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.font-geist .bn-editor {
+  font-family: Geist, sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+.font-geist {
+  font-family: var(--font-geist);
+}
+.font-lora {
+  font-family: var(--font-lora);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+.font-caveat {
+  font-family: var(--font-caveat);
+}
+.font-virgil {
+  font-family: var(--font-virgil);
+  
+}
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+.font-nunito {
+  font-family: var(--font-nunito);
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);

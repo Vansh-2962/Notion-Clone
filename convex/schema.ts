@@ -19,4 +19,10 @@ export default defineSchema({
     .index("by_userid", ["userId"])
     .index("by_parentId", ["parentId"])
     .index("by_user_parent", ["userId", "parentId"]),
+
+  settings: defineTable({
+    font: v.string(),
+    fontSize: v.string(),
+    userId: v.string(),
+  }).index("by_userId", ["userId"]),
 })

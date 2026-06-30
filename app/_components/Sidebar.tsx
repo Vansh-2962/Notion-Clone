@@ -2,7 +2,7 @@
 import { UserButton, useUser } from "@clerk/nextjs"
 import { sidebarItems, SidebarItemsType } from "../../lib/sidebarItems"
 import { cn } from "@/lib/utils"
-import { ChevronsLeft } from "lucide-react"
+import { ChevronsLeft, Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { useMutation, useQuery } from "convex/react"
@@ -15,10 +15,11 @@ import { SearchModal } from "../_modals/SearchModal"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Kbd } from "@/components/ui/kbd"
 import FavDocsList from "./FavDocsList"
-import { Document } from "../types/types"
 import PrivateDocsList from "./PrivateDocsList"
+import { useTheme } from "next-themes"
 
 const Sidebar = () => {
+  const { theme, setTheme } = useTheme()
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
 
@@ -39,6 +40,8 @@ const Sidebar = () => {
       router.push("/dashboard/trash")
     } else if (type.toLowerCase() === "search") {
       setOpen(true)
+    } else if (type.toLowerCase() === "settings") {
+      router.push("/dashboard/settings")
     }
   }
 
@@ -60,25 +63,36 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        `h-full w-1/8 border-x border-border bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,0.06)_0px,rgba(0,0,0,0.06)_2px,transparent_2px,transparent_8px)] transition-transform duration-300 ease-in-out dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_2px,transparent_2px,transparent_8px)]`,
+        `h-full w-1/8 border-x border-border bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,0.03)_0px,rgba(0,0,0,0.03)_2px,transparent_2px,transparent_8px)] transition-transform duration-300 ease-in-out dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_2px,transparent_2px,transparent_8px)]`,
         isSidebarOpen ? "-translate-x-full" : "translate-x-0"
       )}
     >
-      <div className="mr-8 h-full border-r bg-muted dark:bg-black">
-        <h2 className="flex items-center justify-between p-5 text-sm font-medium">
-          <UserButton />
-          <div className="flex items-center gap-2">
-            <p>{username}</p>
-            <Button
-              onClick={() => setIsSidebarOpen(true)}
-              variant={"ghost"}
-              size={"icon"}
-              className="rounded-md p-1 hover:bg-zinc-200 hover:dark:bg-zinc-800"
-            >
-              <ChevronsLeft className="h-6 w-6 text-muted-foreground" />
-            </Button>
+      <div className="mr-8 h-full border-r bg-white dark:bg-black">
+        <div className="flex items-center justify-between border-b px-2 py-3 text-sm font-medium">
+          <div className="flex w-full items-center gap-2 rounded-full border px-1 py-1 shadow backdrop-blur-sm dark:bg-white/10">
+            <UserButton />
+            <div className="flex w-full items-center justify-between gap-2">
+              <p className="text-xs">{username}</p>
+
+              <Button
+                onClick={() => setIsSidebarOpen(true)}
+                variant={"ghost"}
+                size={"icon-sm"}
+                className="rounded-md"
+              >
+                <ChevronsLeft className="h-6 w-6 text-muted-foreground" />
+              </Button>
+            </div>
           </div>
-        </h2>
+          <Button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            size={"icon-xs"}
+            variant={"ghost"}
+            className="ml-1 rounded-full"
+          >
+            {theme === "dark" ? <Sun /> : <Moon />}
+          </Button>
+        </div>
 
         <div className="py-3">
           {sidebarItems.map((item: SidebarItemsType) => (
@@ -87,8 +101,8 @@ const Sidebar = () => {
               role="button"
               key={item.id}
               className={cn(
-                `my-1 flex cursor-pointer items-center justify-between px-5 py-1 text-muted-foreground hover:bg-primary-foreground hover:text-primary hover:dark:bg-zinc-900 hover:dark:text-white`,
-                item.label === "Trash" && "mt-3"
+                `my-1 flex cursor-pointer items-center justify-between px-5 py-1 text-sm text-muted-foreground hover:bg-primary-foreground hover:text-primary hover:dark:bg-zinc-900 hover:dark:text-white`,
+                item.label === "Trash" && "mt-3 dark:hover:text-red-500"
               )}
             >
               <div className="flex items-center gap-3">
@@ -107,7 +121,10 @@ const Sidebar = () => {
 
         {/* Rendering the docs list */}
         <div className="py-3">
-          <span className="px-5 text-xs font-bold">RECENTS</span>
+          {docs && docs.length > 0 && (
+            <span className="px-5 text-xs font-bold">RECENTS</span>
+          )}
+
           <div className="py-3">
             {docs === undefined ? (
               <div className="px-5 py-3">

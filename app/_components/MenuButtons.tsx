@@ -1,20 +1,10 @@
 import { Button } from "@/components/ui/button"
-import {
-  Check,
-  Globe,
-  Info,
-  Lock,
-  LockOpen,
-  Moon,
-  Star,
-  Sun,
-} from "lucide-react"
+import { Check, Globe, Info, Lock, LockOpen, Star } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -27,7 +17,6 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 import { useOrigin } from "@/hooks/use-origin"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 
 interface MenuButtonsProps {
@@ -39,7 +28,6 @@ interface MenuButtonsProps {
 }
 
 const MenuButtons = ({ id, title, isFav, isPub, isPriv }: MenuButtonsProps) => {
-  const { theme, setTheme } = useTheme()
   const [publishing, setPublishing] = useState(false)
   const [copied, setCopied] = useState(false)
   const origin = useOrigin()
@@ -173,13 +161,6 @@ const MenuButtons = ({ id, title, isFav, isPub, isPriv }: MenuButtonsProps) => {
           <p>Add to {isPriv ? "Public" : "Private"}</p>
         </TooltipContent>
       </Tooltip>
-      <Button
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        variant={"outline"}
-        size={"icon-sm"}
-      >
-        {theme === "dark" ? <Sun /> : <Moon />}
-      </Button>
     </div>
   )
 }

@@ -1,7 +1,17 @@
-import { Geist_Mono, Inter } from "next/font/google"
+import {
+  Geist_Mono,
+  Inter,
+  Geist,
+  Lora,
+  Nunito,
+  Playfair_Display,
+  Caveat,
+  JetBrains_Mono,
+} from "next/font/google"
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import { extractRouterConfig } from "uploadthing/server"
 import { ourFileRouter } from "@/app/api/uploadthing/core"
+import localFont from "next/font/local"
 
 import "../globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -19,6 +29,41 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
+})
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+})
+
+const virgil = localFont({
+  src: "../fonts/Virgil.woff2",
+  variable: "--font-virgil",
+})
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+})
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
+})
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+})
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,9 +75,17 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn(
         "antialiased",
-        fontMono.variable,
         "font-sans",
-        inter.variable
+
+        inter.variable,
+        fontMono.variable,
+        virgil.variable,
+        geist.variable,
+        lora.variable,
+        nunito.variable,
+        caveat.variable,
+        playfair.variable,
+        jetbrains.variable
       )}
     >
       <body>

@@ -16,7 +16,9 @@ const PrivateDocsList = ({ docs }: FavDocsListProps) => {
   return (
     <main>
       <div>
-        <span className="px-5 text-xs font-bold">PRIVATE</span>
+        {privateDocs?.length > 0 && (
+          <span className="px-5 text-xs font-bold">PRIVATE</span>
+        )}
         <DocsList docs={privateDocs} />
       </div>
     </main>

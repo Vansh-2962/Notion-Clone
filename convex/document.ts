@@ -24,7 +24,7 @@ export const getDocs = query({
 export const getDoc = query({
   args: { _id: v.string() },
   handler: async (ctx, args) => {
-    const identity = ctx.auth.getUserIdentity()
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error("Unauthorized")
     }
@@ -498,5 +498,57 @@ export const deleteDoc = mutation({
     await deleteRecursively(args._id as Id<"documents">)
 
     return { success: true }
+  },
+})
+
+// -----------------------------------------------------------------
+
+export const updateFont = mutation({
+  args: {
+    font: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) throw new Error("Unauthorized")
+
+    const userId = identity.subject
+
+    const settings = await ctx.db
+      .query("settings")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!settings) {
+      return await ctx.db.insert("settings", {
+        userId,
+        font: args.font,
+        fontSize: "medium",
+      })
+    }
+
+    await ctx.db.patch(settings._id, {
+      font: args.font,
+    })
+
+    return settings._id
+  },
+})
+
+export const getSettings = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+    const userId = identity.subject
+
+    const setting = await ctx.db
+      .query("settings")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect()
+
+    return setting[0]
   },
 })

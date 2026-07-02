@@ -535,6 +535,37 @@ export const updateFont = mutation({
   },
 })
 
+export const updateFontSize = mutation({
+  args: {
+    fontSize: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if (!identity) throw new Error("Unauthorized")
+
+    const userId = identity.subject
+
+    const settings = await ctx.db
+      .query("settings")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique()
+
+    if (!settings) {
+      return await ctx.db.insert("settings", {
+        userId,
+        fontSize: args.fontSize,
+      })
+    }
+
+    await ctx.db.patch(settings._id, {
+      fontSize: args.fontSize,
+    })
+
+    return settings._id
+  },
+})
+
 export const getSettings = query({
   args: {},
   handler: async (ctx, args) => {
@@ -550,5 +581,45 @@ export const getSettings = query({
       .collect()
 
     return setting[0]
+  },
+})
+
+// ------------------------------------------------------------------------
+
+export const saveSnapshot = mutation({
+  args: {
+    snapshot: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const existing = await ctx.db.query("diagrams").first()
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        snapshot: args.snapshot,
+        updatedAt: Date.now(),
+      })
+    } else {
+      await ctx.db.insert("diagrams", {
+        snapshot: args.snapshot,
+        updatedAt: Date.now(),
+      })
+    }
+  },
+})
+
+export const getSnapshot = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    return await ctx.db.query("diagrams").first()
   },
 })

@@ -1,4 +1,11 @@
-import { LucideIcon, Plus, Search, Settings, Trash } from "lucide-react"
+import {
+  LucideIcon,
+  Palette,
+  Plus,
+  Search,
+  Settings,
+  Trash,
+} from "lucide-react"
 
 export type SidebarItemsType = {
   id: number
@@ -25,6 +32,11 @@ export const sidebarItems: SidebarItemsType[] = [
   },
   {
     id: 4,
+    label: "Draw",
+    icon: Palette,
+  },
+  {
+    id: 5,
     label: "Trash",
     icon: Trash,
     href: "/dashboard/trash",

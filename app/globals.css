@@ -11,6 +11,7 @@
 .bn-editor,
 .bn-root {
   background-color: white !important;
+  font-size: var(--editor-font-size, 16px);
 }
 
 .dark .bn-container,
@@ -19,22 +20,45 @@
   background-color: #090b0c !important;
 }
 
-.font-inter .bn-editor {
-  font-family: Inter, sans-serif;
+.font-inter .bn-editor,
+.font-inter .bn-editor * {
+  font-family: var(--font-sans);
 }
 
-.font-serif .bn-editor {
-  font-family: Georgia, serif;
+.font-geist .bn-editor,
+.font-geist .bn-editor * {
+  font-family: var(--font-geist);
 }
 
-.font-mono .bn-editor {
-  font-family: "JetBrains Mono", monospace;
+.font-lora .bn-editor,
+.font-lora .bn-editor * {
+  font-family: var(--font-lora);
 }
 
-.font-geist .bn-editor {
-  font-family: Geist, sans-serif;
+.font-jetbrains .bn-editor,
+.font-jetbrains .bn-editor * {
+  font-family: var(--font-jetbrains);
 }
 
+.font-caveat .bn-editor,
+.font-caveat .bn-editor * {
+  font-family: var(--font-caveat);
+}
+
+.font-playfair .bn-editor,
+.font-playfair .bn-editor * {
+  font-family: var(--font-playfair);
+}
+
+.font-nunito .bn-editor,
+.font-nunito .bn-editor * {
+  font-family: var(--font-nunito);
+}
+
+.font-virgil .bn-editor,
+.font-virgil .bn-editor * {
+  font-family: var(--font-virgil);
+}
 .font-inter {
   font-family: var(--font-inter);
 }
@@ -52,7 +76,6 @@
 }
 .font-virgil {
   font-family: var(--font-virgil);
-  
 }
 .font-playfair {
   font-family: var(--font-playfair);

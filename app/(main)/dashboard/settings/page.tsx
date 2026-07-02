@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
-import { FONTS } from "@/lib/constant"
+import { FONT_SIZE_MAP, FONT_SIZES, FONTS } from "@/lib/constant"
 import { cn } from "@/lib/utils"
 import { useMutation, useQuery } from "convex/react"
 import { Moon, Sun } from "lucide-react"
@@ -14,22 +14,37 @@ interface fontType {
   name: string
 }
 
+interface fontSizeType {
+  id: string
+  name: string
+  value: string
+}
+
+export const FONT_SIZE_MAP_PREVIEW = {
+  small: "text-sm",
+  medium: "text-base",
+  large: "text-lg",
+  xl: "text-xl",
+} as const
+
 const page = () => {
   const { theme, setTheme } = useTheme()
-  const [selectedFont, setSelectedFont] = useState("inter")
 
   const settings = useQuery(api.document.getSettings)
   const updateFont = useMutation(api.document.updateFont)
-
-  useEffect(() => {
-    if (!settings) return
-    setSelectedFont(settings?.font)
-  }, [settings])
+  const updateFontSize = useMutation(api.document.updateFontSize)
 
   const handleFontSelect = async (font: string) => {
     if (!font) return
     await updateFont({
       font: font,
+    })
+  }
+
+  const handleFontSizeSelect = async (fontSize: string) => {
+    if (!fontSize) return
+    await updateFontSize({
+      fontSize: fontSize,
     })
   }
 
@@ -60,6 +75,7 @@ const page = () => {
         </div>
       </div>
 
+      {/* FONTS */}
       <div className="mt-8 space-y-2">
         <h3 className="font-medium text-muted-foreground dark:text-white">
           Font
@@ -72,11 +88,43 @@ const page = () => {
               key={font.id}
               className={cn(
                 `border p-3 shadow`,
-                selectedFont === font.id && "border-primary"
+                settings?.font === font.id && "border-primary"
               )}
             >
               <span className="font-bold text-primary">{font.name}</span>
               <p className={cn(`text-lg`, font.className)}>Hello World!</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FONT SIZE */}
+      <div className="mt-8 space-y-2">
+        <h3 className="font-medium text-muted-foreground dark:text-white">
+          Font Size
+        </h3>
+        <div className="grid grid-cols-4 gap-3">
+          {FONT_SIZES.map((font: fontSizeType) => (
+            <div
+              onClick={() => handleFontSizeSelect(font.id)}
+              role="button"
+              key={font.id}
+              className={cn(
+                `border p-3 shadow`,
+                settings?.fontSize?.toLowerCase() === font.id.toLowerCase() &&
+                  "border-primary"
+              )}
+            >
+              <span className="font-bold text-primary">{font.name}</span>
+              <p
+                className={cn(
+                  FONT_SIZE_MAP_PREVIEW[
+                    font.id as keyof typeof FONT_SIZE_MAP_PREVIEW
+                  ]
+                )}
+              >
+                Hello World!
+              </p>
             </div>
           ))}
         </div>

@@ -21,8 +21,13 @@ export default defineSchema({
     .index("by_user_parent", ["userId", "parentId"]),
 
   settings: defineTable({
-    font: v.string(),
-    fontSize: v.string(),
+    font: v.optional(v.string()),
+    fontSize: v.optional(v.string()),
     userId: v.string(),
   }).index("by_userId", ["userId"]),
+
+  diagrams: defineTable({
+    snapshot: v.string(),
+    updatedAt: v.number(),
+  }).index("by_snapshot", ["snapshot"]),
 })

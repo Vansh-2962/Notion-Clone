@@ -40,3 +40,44 @@ export const FONTS = [
     className: "font-nunito",
   },
 ]
+
+export const FONT_CLASS_MAP = {
+  inter: "font-inter",
+  geist: "font-geist",
+  lora: "font-lora",
+  jetbrains: "font-jetbrains",
+  caveat: "font-caveat",
+  playfair: "font-playfair",
+  nunito: "font-nunito",
+  virgil: "font-virgil",
+} as const
+
+export const FONT_SIZES = [
+  {
+    id: "small",
+    name: "Small",
+    value: "14px",
+  },
+  {
+    id: "medium",
+    name: "Medium",
+    value: "16px",
+  },
+  {
+    id: "large",
+    name: "Large",
+    value: "18px",
+  },
+  {
+    id: "xl",
+    name: "Extra Large",
+    value: "20px",
+  },
+]
+
+export const FONT_SIZE_MAP = {
+  small: "14px",
+  medium: "16px",
+  large: "18px",
+  xl: "20px",
+} as const

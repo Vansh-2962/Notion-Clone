@@ -81,3 +81,26 @@ export const FONT_SIZE_MAP = {
   large: "18px",
   xl: "20px",
 } as const
+
+export const FEATURES = [
+  {
+    title: "Rich Text Editor",
+    description: "Beautiful writing experience.",
+  },
+  {
+    title: "Infinite Whiteboard",
+    description: "Sketch without limits.",
+  },
+  {
+    title: "Media Uploads",
+    description: "Embed files seamlessly.",
+  },
+  {
+    title: "Fast Search",
+    description: "Find anything instantly.",
+  },
+  {
+    title: "Nested Pages",
+    description: "Organize everything effortlessly.",
+  },
+]

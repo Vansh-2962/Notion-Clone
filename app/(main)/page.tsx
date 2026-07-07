@@ -1,4 +1,5 @@
 import Navbar from "../_components/Navbar"
+import CTA from "../_components/landing/CTA"
 import DashboardImage from "../_components/landing/DashboardImage"
 import FAQs from "../_components/landing/FAQs"
 import Features from "../_components/landing/Features"
@@ -27,6 +28,9 @@ export default function Page() {
 
         {/* FAQs */}
         <FAQs />
+
+        {/* CTA */}
+        <CTA />
       </section>
     </div>
   )

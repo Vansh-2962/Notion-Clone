@@ -1,5 +1,6 @@
 import Navbar from "../_components/Navbar"
 import DashboardImage from "../_components/landing/DashboardImage"
+import FAQs from "../_components/landing/FAQs"
 import Features from "../_components/landing/Features"
 import Hero from "../_components/landing/Hero"
 import { Testimonials } from "../_components/landing/Testimonials"
@@ -23,6 +24,9 @@ export default function Page() {
 
         {/* Testimonials */}
         <Testimonials />
+
+        {/* FAQs */}
+        <FAQs />
       </section>
     </div>
   )

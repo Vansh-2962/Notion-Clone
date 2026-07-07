@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Autoplay from "embla-carousel-autoplay"
-
+import { motion } from "motion/react"
 import {
   Carousel,
   CarouselContent,
@@ -59,20 +59,47 @@ export function Testimonials() {
   )
 
   return (
-    <section className="border-y">
+    <section className="border-b">
       <div className="border-b px-6 py-16 text-center">
-        <p className="mb-3 text-xs tracking-[0.35em] text-zinc-500 uppercase">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+            transition: { delay: 0.2, duration: 0.5 },
+          }}
+
+          className="mb-3 text-xs tracking-[0.35em] text-zinc-500 uppercase"
+        >
           Testimonials
-        </p>
+        </motion.p>
 
-        <h2 className="text-3xl font-semibold tracking-tight">
+        <motion.h2
+          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: { delay: 0.2, duration: 0.5 },
+          }}
+          className="text-3xl font-semibold tracking-tight"
+        >
           Loved by developers and teams.
-        </h2>
+        </motion.h2>
 
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-500">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+            transition: { delay: 0.4, duration: 0.7 },
+          }}
+
+          className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-500"
+        >
           Thousands of ideas, notes, and projects organized inside one
           distraction-free workspace.
-        </p>
+        </motion.p>
       </div>
 
       <div className="relative px-10 py-12">
@@ -86,12 +113,21 @@ export function Testimonials() {
           onMouseLeave={plugin.current.reset}
         >
           <CarouselContent>
-            {testimonials.map((testimonial) => (
+            {testimonials.map((testimonial, index: number) => (
               <CarouselItem
                 key={testimonial.name}
                 className="md:basis-1/2 lg:basis-1/3"
               >
-                <div className="h-full border bg-background p-8 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                <motion.div
+                  initial={{ opacity: 0, filter: "blur(10px)" }}
+                  whileInView={{
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    transition: { delay: 0.2 + index * 0.1, duration: 0.8 },
+                  }}
+
+                  className="h-full border bg-background p-8 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                >
                   <p className="text-sm leading-7 text-zinc-500 dark:text-zinc-200">
                     "{testimonial.quote}"
                   </p>
@@ -103,7 +139,7 @@ export function Testimonials() {
                       {testimonial.role} · {testimonial.company}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               </CarouselItem>
             ))}
           </CarouselContent>

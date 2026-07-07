@@ -8,10 +8,11 @@ import lightLogo from "@/public/light.png"
 import darkLogo from "@/public/dark.png"
 import Image from "next/image"
 import { useTheme } from "next-themes"
+import { Moon, Sun } from "lucide-react"
 
 const Navbar = () => {
   const router = useRouter()
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   return (
     <header>
@@ -26,20 +27,28 @@ const Navbar = () => {
             <h1 className="text-lg font-bold tracking-tighter">MindDock</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Authenticated>
-              <Button
-                size={"icon-sm"}
-                onClick={() =>
-                  window.open(
-                    `https://github.com/Vansh-2962/Notion-Clone.git`,
-                    "_blank"
-                  )
-                }
-                variant={"ghost"}
-              >
-                <GithubIcon />
-              </Button>
+            <Button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              size={"icon-sm"}
+              variant={"ghost"}
+              className="text-zinc-500 dark:text-white/70"
+            >
+              {theme == "dark" ? <Sun /> : <Moon />}
+            </Button>
 
+            <Button
+              size={"icon-sm"}
+              onClick={() =>
+                window.open(
+                  `https://github.com/Vansh-2962/Notion-Clone.git`,
+                  "_blank"
+                )
+              }
+              variant={"ghost"}
+            >
+              <GithubIcon />
+            </Button>
+            <Authenticated>
               <Button
                 variant={"outline"}
                 onClick={() => router.push("/dashboard")}

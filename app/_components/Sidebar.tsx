@@ -65,25 +65,27 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        `h-full w-1/8 border-x border-border bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,0.03)_0px,rgba(0,0,0,0.03)_2px,transparent_2px,transparent_8px)] transition-transform duration-300 ease-in-out dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_2px,transparent_2px,transparent_8px)]`,
-        isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        "overflow-hidden border-r transition-all duration-300 ease-in-out",
+        "bg-[repeating-linear-gradient(-45deg,rgba(0,0,0,0.03)_0px,rgba(0,0,0,0.03)_2px,transparent_2px,transparent_8px)]",
+        "dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_2px,transparent_2px,transparent_8px)]",
+        isSidebarOpen ? "w-0" : "w-80"
       )}
     >
-      <div className="mr-8 h-full border-r bg-white dark:bg-black">
+      <div className="h-full w-[calc(100%-2rem)] border-r bg-white dark:bg-black">
         <div className="flex items-center justify-between border-b px-2 py-3 text-sm font-medium">
           <div className="flex w-full items-center gap-2 rounded-full border px-1 py-1 shadow backdrop-blur-sm dark:bg-white/10">
             <UserButton />
             <div className="flex w-full items-center justify-between gap-2">
               <p className="text-xs">{username}</p>
 
-              <Button
-                onClick={() => setIsSidebarOpen(true)}
+              {/* <Button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 variant={"ghost"}
                 size={"icon-sm"}
                 className="rounded-md"
               >
                 <ChevronsLeft className="h-6 w-6 text-muted-foreground" />
-              </Button>
+              </Button> */}
             </div>
           </div>
           <Button

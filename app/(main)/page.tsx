@@ -3,6 +3,7 @@ import CTA from "../_components/landing/CTA"
 import DashboardImage from "../_components/landing/DashboardImage"
 import FAQs from "../_components/landing/FAQs"
 import Features from "../_components/landing/Features"
+import Footer from "../_components/landing/Footer"
 import Hero from "../_components/landing/Hero"
 import { Testimonials } from "../_components/landing/Testimonials"
 import TrustedBy from "../_components/landing/TrustedBy"
@@ -31,6 +32,9 @@ export default function Page() {
 
         {/* CTA */}
         <CTA />
+
+        {/* Footer */}
+        <Footer />
       </section>
     </div>
   )

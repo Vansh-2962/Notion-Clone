@@ -5,8 +5,8 @@ import { motion } from "motion/react"
 
 const CTA = () => {
   return (
-    <section className="border-t">
-      <div className="mx-auto flex max-w-6xl flex-col items-center border-x px-6 py-24 text-center">
+    <section className="border-b">
+      <div className="mx-auto flex max-w-6xl flex-col items-center px-6 py-24 text-center">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{

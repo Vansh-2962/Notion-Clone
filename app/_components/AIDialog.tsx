@@ -25,7 +25,7 @@ const AIDialog = ({
   const [open, setOpen] = useState<boolean>(false)
 
   const handleGenerate = async (
-    e: React.FormEvent<HTMLFormElement> | MouseEventHandler<HTMLButtonElement>
+    e: React.FormEvent<HTMLFormElement> 
   ) => {
     e.preventDefault()
     if (!prompt) {
@@ -95,9 +95,7 @@ const AIDialog = ({
                     </p>
 
                     <div className="mt-5 flex items-center gap-3">
-                      <Button variant="ghost" onClick={handleGenerate}>
-                        Retry
-                      </Button>
+                     
                       <Button variant="ghost" onClick={() => setError(false)}>
                         Dismiss
                       </Button>

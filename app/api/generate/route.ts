@@ -5,7 +5,7 @@ const client = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 })
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const { prompt } = await req.json()
     if (!prompt.trim()) {
@@ -31,7 +31,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 - Do not wrap the response in triple backticks.
                 - Return only the final document.
         `
-    const models = await client.models.list()
     const response = await client.models.generateContentStream({
       model: "gemini-3.5-flash",
       contents: `${systemPrompt}\n\nUser: ${prompt}`,

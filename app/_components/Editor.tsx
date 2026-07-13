@@ -8,18 +8,22 @@ import "@blocknote/mantine/style.css"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Doc } from "@/convex/_generated/dataModel"
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTheme } from "next-themes"
 import { FONT_CLASS_MAP, FONT_SIZE_MAP } from "@/lib/constant"
 
 interface EditorProps {
   doc: Doc<"documents">
   isView?: boolean
+  aiResponse?: string
 }
 
-export default function Editor({ doc, isView }: EditorProps) {
+export default function Editor({ doc, isView, aiResponse }: EditorProps) {
+  const [renderMarkdown, setRenderMarkdown] = useState("")
   const updateContent = useMutation(api.document.addContent)
   const settings = useQuery(api.document.getSettings)
+  const lastResponse = useRef("")
+  const frame = useRef<number | undefined>(0)
 
   const { resolvedTheme } = useTheme()
 
@@ -50,6 +54,34 @@ export default function Editor({ doc, isView }: EditorProps) {
       })
     })
   }, [editor, doc, updateContent])
+
+  useEffect(() => {
+    if (!aiResponse) return
+
+    if (frame.current) return
+
+    frame.current = requestAnimationFrame(() => {
+      setRenderMarkdown(aiResponse)
+      frame.current = undefined
+    })
+
+    return () => {
+      if (frame.current) {
+        cancelAnimationFrame(frame.current)
+      }
+    }
+  }, [aiResponse])
+
+  useEffect(() => {
+    if (!editor || !renderMarkdown) return
+
+    const updateEditor = async () => {
+      const blocks = await editor.tryParseMarkdownToBlocks(renderMarkdown)
+      editor.replaceBlocks(editor.document, blocks)
+    }
+
+    updateEditor()
+  }, [editor, renderMarkdown])
 
   if (!doc) {
     return <>Loading...</>

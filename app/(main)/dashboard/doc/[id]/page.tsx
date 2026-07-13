@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
-import { Images, MessageSquareMore, Smile, Trash } from "lucide-react"
+import {
+  Images,
+  MessageSquareMore,
+  Smile,
+  Sparkles,
+  Star,
+  Trash,
+} from "lucide-react"
 import { useParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react"
@@ -19,6 +26,7 @@ import { useUploadThing } from "@/lib/uploadthing"
 import Image from "next/image"
 import { toast } from "sonner"
 import { getUploadErrorMessage } from "@/lib/uploadThingError"
+import AIDialog from "@/app/_components/AIDialog"
 
 const Page = () => {
   const { id } = useParams()
@@ -27,6 +35,7 @@ const Page = () => {
 
   const [emojiModal, setEmojiModal] = useState<boolean>(false)
   const [isCommenting, setIsCommenting] = useState<boolean>(false)
+  const [aiResponse, setAIResponse] = useState<string>("")
 
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -212,21 +221,24 @@ const Page = () => {
               <MessageSquareMore /> Add comment
             </Button>
           </div>
-          <h1
-            ref={titleRef}
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={onBlur}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                e.currentTarget.blur()
-              }
-            }}
-            className="mt-1 text-4xl font-bold tracking-tight text-muted-foreground outline-none dark:text-zinc-200"
-          >
-            {doc?.title ?? "Untitled"}
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1
+              ref={titleRef}
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={onBlur}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  e.currentTarget.blur()
+                }
+              }}
+              className="mt-1 text-4xl font-bold tracking-tight text-muted-foreground outline-none dark:text-zinc-200"
+            >
+              {doc?.title ?? "Untitled"}
+            </h1>
+            <AIDialog setAIResponse={setAIResponse} />
+          </div>
           {doc?.comments && (
             <div className="group my-8 flex items-center justify-between">
               <div className="flex gap-3 text-sm text-muted-foreground">
@@ -266,7 +278,7 @@ const Page = () => {
           className="bg-black"
         />
 
-        <Editor doc={doc as Doc<"documents">} />
+        <Editor doc={doc as Doc<"documents">} aiResponse={aiResponse} />
       </section>
     </main>
   )

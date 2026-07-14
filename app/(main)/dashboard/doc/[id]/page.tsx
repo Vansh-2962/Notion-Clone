@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
 import {
   Images,
+  Menu,
   MessageSquareMore,
   Smile,
   Sparkles,
@@ -27,10 +28,18 @@ import Image from "next/image"
 import { toast } from "sonner"
 import { getUploadErrorMessage } from "@/lib/uploadThingError"
 import AIDialog from "@/app/_components/AIDialog"
+import { useSidebarStore } from "@/app/_store/useSidebarStore"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { MoreVertical } from "lucide-react"
 
 const Page = () => {
   const { id } = useParams()
   const { theme } = useTheme()
+  const { toggle, isOpen } = useSidebarStore()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [emojiModal, setEmojiModal] = useState<boolean>(false)
@@ -106,65 +115,97 @@ const Page = () => {
   }
 
   return (
-    <main className="h-screen w-full overflow-y-auto">
-      <header className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-end gap-3 text-nowrap">
-          <h1
-            ref={titleRef}
-            contentEditable
-            suppressContentEditableWarning
-            className="text-xl outline-none"
-            onBlur={onBlur}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                e.currentTarget.blur()
-              }
-            }}
-          >
-            {doc == undefined ? (
-              <Skeleton className="h-4 w-37.5" />
-            ) : (
-              doc?.title
-            )}
-          </h1>
+    <main className="min-h-dvh w-full overflow-y-auto">
+      <header className="flex flex-wrap items-start justify-between gap-3 px-4 py-4 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:gap-3">
+              <h1
+                ref={titleRef}
+                contentEditable
+                suppressContentEditableWarning
+                className="truncate text-lg font-semibold outline-none sm:text-xl"
+                onBlur={onBlur}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    e.currentTarget.blur()
+                  }
+                }}
+              >
+                {doc === undefined ? (
+                  <Skeleton className="h-5 w-40" />
+                ) : (
+                  doc.title
+                )}
+              </h1>
 
-          <small className="text-muted-foreground">
-            {doc === undefined ? (
-              <Skeleton className="h-3 w-16" />
-            ) : (
-              timeAgo(new Date(doc?._creationTime as number))
-            )}
-          </small>
+              <small className="shrink-0 text-xs text-muted-foreground sm:text-sm">
+                {doc === undefined ? (
+                  <Skeleton className="h-3 w-16" />
+                ) : (
+                  timeAgo(new Date(doc._creationTime))
+                )}
+              </small>
+            </div>
+          </div>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggle}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <div className="hidden shrink-0 md:block">
+          <MenuButtons
+            id={id as Id<"documents">}
+            title={doc.title}
+            isFav={doc.isFavourite}
+            isPub={doc.isPublished}
+            isPriv={doc.isPrivate}
+          />
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <MoreVertical className="h-5 w-5" />
+            </Button>
+          </PopoverTrigger>
 
-        <MenuButtons
-          id={id as Id<"documents">}
-          title={doc.title}
-          isFav={doc.isFavourite}
-          isPub={doc.isPublished}
-          isPriv={doc.isPrivate}
-        />
+          <PopoverContent align="end" className="w-56 p-2">
+            <MenuButtons
+              id={id as Id<"documents">}
+              title={doc.title}
+              isFav={doc.isFavourite}
+              isPub={doc.isPublished}
+              isPriv={doc.isPrivate}
+            />
+          </PopoverContent>
+        </Popover>
       </header>
 
-      <section className="group relative h-64 w-full">
+      <section className="group relative h-40 w-full sm:h-48 md:h-56 lg:h-64">
         {doc.coverImage ? (
           <Image
             src={doc.coverImage}
             alt="Document cover"
             fill
-            className="object-cover"
             priority
+            className="object-cover"
+            sizes="100vw"
           />
         ) : isUploading ? (
           <Skeleton className="h-full w-full" />
         ) : null}
-        <div className="absolute right-2 bottom-2 flex items-center gap-2 opacity-0 group-hover:opacity-100">
+
+        <div className="absolute right-2 bottom-2 flex items-center gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
           {doc.coverImage && (
             <Button
               onClick={() => handleRemoveCover(doc._id as Id<"documents">)}
-              size={"xs"}
-              className="bg-white/50 backdrop-blur-sm"
+              size="xs"
+              className="bg-white/60 px-2 py-1 text-xs backdrop-blur-sm sm:px-3 sm:text-sm"
             >
               Remove cover
             </Button>
@@ -172,17 +213,27 @@ const Page = () => {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl">
+      <section className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="group py-5">
-          <span className="">{doc?.icon && <img src={doc?.icon} />}</span>
-          <div className="mt-1 opacity-0 transition-all ease-in-out group-hover:opacity-100">
+          <span>
+            {doc?.icon && (
+              <img
+                src={doc.icon}
+                alt="Document icon"
+                className="h-12 w-12 sm:h-16 sm:w-16"
+              />
+            )}
+          </span>
+
+          <div className="mt-2 flex flex-wrap items-center gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
             <Button
-              size={"sm"}
-              variant={"ghost"}
+              size="sm"
+              variant="ghost"
               className="border-none text-muted-foreground outline-none focus:outline-0"
               onClick={() => setEmojiModal(!emojiModal)}
             >
-              <Smile /> Add icon
+              <Smile className="mr-1 h-4 w-4" />
+              Add icon
             </Button>
 
             <input
@@ -204,24 +255,27 @@ const Page = () => {
               <Button
                 disabled={isUploading}
                 onClick={() => fileRef.current?.click()}
-                size={"sm"}
-                variant={"ghost"}
+                size="sm"
+                variant="ghost"
                 className="border-none text-muted-foreground outline-none focus:outline-0"
               >
-                <Images /> Add cover
+                <Images className="mr-1 h-4 w-4" />
+                Add cover
               </Button>
             )}
 
             <Button
-              size={"sm"}
-              variant={"ghost"}
+              size="sm"
+              variant="ghost"
               onClick={() => setIsCommenting(!isCommenting)}
               className="border-none text-muted-foreground outline-none focus:outline-0"
             >
-              <MessageSquareMore /> Add comment
+              <MessageSquareMore className="mr-1 h-4 w-4" />
+              Add comment
             </Button>
           </div>
-          <div className="flex items-center justify-between">
+
+          <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <h1
               ref={titleRef}
               contentEditable
@@ -233,30 +287,37 @@ const Page = () => {
                   e.currentTarget.blur()
                 }
               }}
-              className="mt-1 text-4xl font-bold tracking-tight text-muted-foreground outline-none dark:text-zinc-200"
+              className="min-w-0 text-3xl font-bold tracking-tight wrap-break-word text-muted-foreground outline-none sm:text-4xl dark:text-zinc-200"
             >
               {doc?.title ?? "Untitled"}
             </h1>
-            <AIDialog setAIResponse={setAIResponse} />
+
+            <div className="shrink-0">
+              <AIDialog setAIResponse={setAIResponse} />
+            </div>
           </div>
+
           {doc?.comments && (
-            <div className="group my-8 flex items-center justify-between">
-              <div className="flex gap-3 text-sm text-muted-foreground">
+            <div className="group my-8 flex items-start justify-between gap-3">
+              <div className="flex min-w-0 gap-3 text-sm text-muted-foreground">
                 <img
                   src={profileImg}
                   alt="profile"
-                  className="h-5 w-5 rounded-full"
+                  className="h-5 w-5 shrink-0 rounded-full"
                 />
-                <div className="flex flex-col">
+
+                <div className="min-w-0">
                   <span className="text-sm font-medium">{user?.fullName}</span>
-                  <p className="text-white">{doc?.comments}</p>
+
+                  <p className="wrap-break-word text-white">{doc.comments}</p>
                 </div>
               </div>
+
               <Button
                 onClick={handleDeleteComment}
-                size={"icon-xs"}
-                variant={"ghost"}
-                className="opacity-0 group-hover:opacity-100"
+                size="icon-xs"
+                variant="ghost"
+                className="shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <Trash />
               </Button>
@@ -275,7 +336,7 @@ const Page = () => {
           emojiStyle={EmojiStyle.FACEBOOK}
           theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
           onEmojiClick={handleEmojiSelect}
-          className="bg-black"
+          className="max-w-full"
         />
 
         <Editor doc={doc as Doc<"documents">} aiResponse={aiResponse} />

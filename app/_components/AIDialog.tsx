@@ -24,9 +24,7 @@ const AIDialog = ({
 
   const [open, setOpen] = useState<boolean>(false)
 
-  const handleGenerate = async (
-    e: React.FormEvent<HTMLFormElement> 
-  ) => {
+  const handleGenerate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!prompt) {
       toast.error("Please provide your prompt")
@@ -42,7 +40,10 @@ const AIDialog = ({
         },
       })
 
-      setOpen(false)
+      if (!response.ok) {
+        throw new Error("Failed to generate response")
+      }
+
       const reader = response.body!.getReader()
       const decoder = new TextDecoder()
       let fullText = ""
@@ -54,6 +55,7 @@ const AIDialog = ({
         fullText += chunk
         setAIResponse(fullText)
       }
+      setOpen(false)
     } catch (error) {
       setError(true)
     } finally {
@@ -95,7 +97,6 @@ const AIDialog = ({
                     </p>
 
                     <div className="mt-5 flex items-center gap-3">
-                     
                       <Button variant="ghost" onClick={() => setError(false)}>
                         Dismiss
                       </Button>

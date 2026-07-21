@@ -2,7 +2,7 @@
 import { UserButton, useUser } from "@clerk/nextjs"
 import { sidebarItems, SidebarItemsType } from "../../lib/sidebarItems"
 import { cn } from "@/lib/utils"
-import { ChevronsLeft, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { useMutation, useQuery } from "convex/react"
@@ -66,7 +66,7 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-50 md:w-80 w-70 overflow-x-hidden overflow-y-auto border-r bg-background",
+        "fixed inset-y-0 left-0 z-50 w-70 overflow-x-hidden overflow-y-auto border-r bg-background md:w-80",
         isOpen ? "translate-x-0" : "-translate-x-full",
         "md:static md:translate-x-0"
       )}

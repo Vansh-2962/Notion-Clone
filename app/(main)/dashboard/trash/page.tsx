@@ -12,7 +12,7 @@ import {
 import { api } from "@/convex/_generated/api"
 import { Doc, Id } from "@/convex/_generated/dataModel"
 import { useMutation, useQuery } from "convex/react"
-import { Trash, Trash2, Undo2 } from "lucide-react"
+import { Menu, Trash, Trash2, Undo2 } from "lucide-react"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import { useSidebarStore } from "@/app/_store/useSidebarStore"
 
 const Page = () => {
   const [deletingTitle, setDeletingTitle] = useState("")
+  const { toggle } = useSidebarStore()
 
   const restoreDoc = useMutation(api.document.restoreDoc)
   const clearTrash = useMutation(api.document.clearTrash)
@@ -64,34 +66,49 @@ const Page = () => {
   }
 
   return (
-    <main className="mx-auto w-6xl">
-      <div className="mt-20 flex items-center justify-between border-b">
-        <h1 className="pb-5 text-5xl font-bold tracking-tight">Trash</h1>
+    <main className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-wrap items-start justify-end gap-3 px-1 py-4 sm:px-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggle}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+      <div className="mt-12 flex flex-col gap-4 border-b pb-5 sm:mt-20 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+          Trash
+        </h1>
+
         {trashedDocs.length > 0 && (
-          <>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button>
-                  <Trash /> Clear Trash
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your documents.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={onClear} variant={"destructive"}>
-                    Yes, Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="w-full sm:w-auto">
+                <Trash className="mr-2 h-4 w-4" />
+                Clear Trash
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your documents.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onClear} variant="destructive">
+                  Yes, Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
 

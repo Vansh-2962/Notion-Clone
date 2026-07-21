@@ -623,3 +623,124 @@ export const getSnapshot = query({
     return await ctx.db.query("diagrams").first()
   },
 })
+
+export const updateAnalytics = mutation({
+  args: {
+    documentId: v.id("documents"),
+    visitorId: v.string(),
+    country: v.optional(v.string()),
+    city: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    browser: v.optional(v.string()),
+    os: v.optional(v.string()),
+    device: v.optional(v.string()),
+  },
+
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("analytics")
+      .withIndex("by_document_visitor", (q) =>
+        q.eq("documentId", args.documentId).eq("visitorId", args.visitorId)
+      )
+      .first()
+
+    if (existing && Date.now() - existing.viewedAt < 1000 * 60 * 30) {
+      return existing._id
+    }
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        viewedAt: Date.now(),
+        country: args.country,
+        city: args.city,
+        referrer: args.referrer,
+        browser: args.browser,
+        os: args.os,
+        device: args.device,
+      })
+
+      return existing._id
+    }
+
+    return await ctx.db.insert("analytics", {
+      documentId: args.documentId,
+      visitorId: args.visitorId,
+      viewedAt: Date.now(),
+      country: args.country,
+      city: args.city,
+      referrer: args.referrer,
+      browser: args.browser,
+      os: args.os,
+      device: args.device,
+    })
+  },
+})
+
+export const getAnalytics = query({
+  args: {
+    documentId: v.id("documents"),
+  },
+
+  handler: async (ctx, args) => {
+    const analytics = await ctx.db
+      .query("analytics")
+      .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
+      .collect()
+
+    const totalViews = analytics.length
+
+    const uniqueVisitors = new Set(analytics.map((a) => a.visitorId)).size
+
+    const countries = new Map<string, number>()
+    const devices = new Map<string, number>()
+    const browsers = new Map<string, number>()
+    const referrers = new Map<string, number>()
+    const views = new Map<string, number>()
+
+    for (const item of analytics) {
+      const country = item.country ?? "Unknown"
+      countries.set(country, (countries.get(country) ?? 0) + 1)
+
+      const device = item.device ?? "Unknown"
+      devices.set(device, (devices.get(device) ?? 0) + 1)
+
+      const browser = item.browser ?? "Unknown"
+      browsers.set(browser, (browsers.get(browser) ?? 0) + 1)
+
+      const referrer = item.referrer || "Direct"
+      referrers.set(referrer, (referrers.get(referrer) ?? 0) + 1)
+
+      const day = new Date(item.viewedAt).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      })
+
+      views.set(day, (views.get(day) ?? 0) + 1)
+    }
+
+    return {
+      totalViews,
+      uniqueVisitors,
+
+      countries: [...countries.entries()]
+        .map(([name, views]) => ({ name, views }))
+        .sort((a, b) => b.views - a.views),
+
+      devices: [...devices.entries()]
+        .map(([name, views]) => ({ name, views }))
+        .sort((a, b) => b.views - a.views),
+
+      browsers: [...browsers.entries()]
+        .map(([name, views]) => ({ name, views }))
+        .sort((a, b) => b.views - a.views),
+
+      referrers: [...referrers.entries()]
+        .map(([name, views]) => ({ name, views }))
+        .sort((a, b) => b.views - a.views),
+
+      views: [...views.entries()].map(([date, views]) => ({
+        date,
+        views,
+      })),
+    }
+  },
+})

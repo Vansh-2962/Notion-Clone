@@ -1,10 +1,10 @@
 "use client"
-import TldrawComponent from "@/app/_components/Tldraw"
+import Excalidraw from "@/app/_components/Excalidraw"
 
 const page = () => {
   return (
     <div className="h-full w-full">
-      <TldrawComponent />
+      <Excalidraw />
     </div>
   )
 }

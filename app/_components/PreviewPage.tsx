@@ -3,7 +3,7 @@ import { timeAgo } from "@/lib/helper"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { api } from "@/convex/_generated/api"
-import { useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { Images, MessageSquareMore, Smile, Trash } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useRef, useState } from "react"
@@ -33,11 +33,33 @@ const PreviewPage = ({ id, reason }: { id?: string; reason?: string }) => {
   const canView = !isPrivate || isOwner
 
   const profileImg = user?.imageUrl
+
   useEffect(() => {
     if (titleRef.current && doc?.title) {
       titleRef.current.textContent = doc.title
     }
   }, [doc?.title])
+
+  useEffect(() => {
+    if (!id) return
+    let visitorId = localStorage.getItem("visitorId")
+
+    if (!visitorId) {
+      visitorId = crypto.randomUUID()
+      localStorage.setItem("visitorId", visitorId)
+    }
+
+    fetch("/api/analytics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        documentId: id,
+        visitorId,
+      }),
+    })
+  }, [id])
 
   if (doc === undefined) {
     return <DocSkeleton />

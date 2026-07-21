@@ -30,4 +30,18 @@ export default defineSchema({
     snapshot: v.string(),
     updatedAt: v.number(),
   }).index("by_snapshot", ["snapshot"]),
+
+  analytics: defineTable({
+    documentId: v.id("documents"),
+    viewedAt: v.number(),
+    country: v.optional(v.string()),
+    city: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    browser: v.optional(v.string()),
+    os: v.optional(v.string()),
+    device: v.optional(v.string()),
+    visitorId: v.string(),
+  })
+    .index("by_document", ["documentId"])
+    .index("by_document_visitor", ["documentId", "visitorId"]),
 })

@@ -18,6 +18,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { useOrigin } from "@/hooks/use-origin"
 import { Input } from "@/components/ui/input"
+import AnalyticsSheet from "./AnalyticsSheet"
 
 interface MenuButtonsProps {
   id: Id<"documents">
@@ -30,6 +31,7 @@ interface MenuButtonsProps {
 const MenuButtons = ({ id, title, isFav, isPub, isPriv }: MenuButtonsProps) => {
   const [publishing, setPublishing] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [open, setOpen] = useState(false)
   const origin = useOrigin()
 
   const link = `${origin}/preview?id=${id}&r=view`
@@ -76,7 +78,11 @@ const MenuButtons = ({ id, title, isFav, isPub, isPriv }: MenuButtonsProps) => {
   }
 
   return (
-    <div className="space-x-3">
+    <div className="flex flex-col md:flex-row md:space-x-3">
+      <Button onClick={() => setOpen(!open)}>Analytics</Button>
+
+      <AnalyticsSheet id={id} open={open} setOpen={setOpen} />
+
       <Popover>
         <PopoverTrigger asChild>
           <Button>

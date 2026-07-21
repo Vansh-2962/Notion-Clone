@@ -32,7 +32,7 @@ export const sidebarItems: SidebarItemsType[] = [
   },
   {
     id: 4,
-    label: "Draw",
+    label: "Canvas",
     icon: Palette,
   },
   {

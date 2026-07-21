@@ -24,7 +24,6 @@ const AnalyticsSheet = ({ id, open, setOpen }: SheetProps) => {
   const analytics = useQuery(api.document.getAnalytics, {
     documentId: id as Id<"documents">,
   })
-  console.log(analytics)
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

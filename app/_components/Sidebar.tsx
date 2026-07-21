@@ -43,7 +43,7 @@ const Sidebar = () => {
       setOpen(true)
     } else if (type.toLowerCase() === "settings") {
       router.push("/dashboard/settings")
-    } else if (type.toLowerCase() === "draw") {
+    } else if (type.toLowerCase() === "canvas") {
       router.push("/dashboard/draw")
     }
   }
